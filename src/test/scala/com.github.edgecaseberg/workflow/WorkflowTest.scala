@@ -65,4 +65,19 @@ class WorkflowTest extends FlatSpec with Matchers{
 		}	
 	}
 
+	it should "resolve a loop transition" in {
+		val log = List(
+			LogEntry(LoopWorkflow.startState, LoopWorkflow.s1, "Null -> S1", Forward, LoopWorkflow.startAction),
+			LogEntry(LoopWorkflow.s1, LoopWorkflow.s2, "S1 -> S2", Forward, LoopWorkflow.a1),
+			LogEntry(LoopWorkflow.s2, LoopWorkflow.s1, "S2 -> S1", Backward, LoopWorkflow.a2),
+			LogEntry(LoopWorkflow.s1, LoopWorkflow.s2, "S1 -> S2", Forward, LoopWorkflow.a1),
+			LogEntry(LoopWorkflow.s2, LoopWorkflow.s1, "S2 -> S1", Backward, LoopWorkflow.a2),
+			LogEntry(LoopWorkflow.s1, LoopWorkflow.s2, "S1 -> S2", Forward, LoopWorkflow.a1),
+			LogEntry(LoopWorkflow.s2, LoopWorkflow.s3, "S2 -> S3", Forward, LoopWorkflow.a3)
+		)
+		assertResult(LoopWorkflow.s3) {
+			Workflow.determineCurrentState(log, LoopWorkflow.workflow)
+		}		
+	}
+
 }
