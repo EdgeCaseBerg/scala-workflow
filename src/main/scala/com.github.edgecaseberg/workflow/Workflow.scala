@@ -13,7 +13,19 @@ case class State(name: String, preRequisite: Option[State] = None)
 
 case class LogEntry(startState: State, endState: State, note: String, flowTaken: Direction, actionTake: Action)
 
-case class Workflow(states: List[State], actions: List[Action])
+case class Workflow(states: List[State], actions: List[Action]) {
+	def possibleActionsForState(state: State) = {
+		Workflow.possibleActionsForState(state, this)
+	}
+
+	def possibleActionsForLog(log: Seq[LogEntry]) = {
+		Workflow.possibleActionsForLog(log, this)
+	}
+
+	def determineCurrentState(log: Seq[LogEntry]) = {
+		Workflow.determineCurrentState(log, this)
+	}
+}
 
 object Workflow {
 	/** Determine the current state of a tracked object by it's Log and the workflow it adheres to
@@ -52,5 +64,13 @@ object Workflow {
 			}
 		}
 		sequences.map(_.headOption).filter(_.isDefined).map(_.get.endState).toSet
+	}
+
+	def possibleActionsForState(state: State, workflow: Workflow) : List[Action] = {
+		workflow.actions.filter(_.from == state)
+	}
+
+	def possibleActionsForLog(log: Seq[LogEntry], workflow: Workflow) : Map[State, List[Action]] = {
+		determineCurrentState(log, workflow).map( state => state -> possibleActionsForState(state, workflow)).toMap
 	}
 }
