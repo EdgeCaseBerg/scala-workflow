@@ -22,7 +22,7 @@ object Workflow {
 	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Set[State] = {
 		val stack = new Stack[LogEntry]
 		if (log.isEmpty) {
-			None
+			Set[State]()
 		} else {
 			for (entry <- log) {
 				entry.flowTaken match {
