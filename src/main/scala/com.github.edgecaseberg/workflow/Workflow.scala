@@ -31,7 +31,6 @@ object Workflow {
 	/** Determine the current state of a tracked object by it's Log and the workflow it adheres to
 	 *
 	 */
-
 	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow): Set[State] = {
 		var sequences = List[Stack[LogEntry]](
 			Stack[LogEntry]()
