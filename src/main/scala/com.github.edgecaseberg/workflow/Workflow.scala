@@ -40,6 +40,7 @@ object Workflow {
 			Set[State]()
 		} else {
 			for (entry <- log) {
+				var pushed = false
 				entry.flowTaken match {
 					case Forward => 
 						sequences.map { stack =>
@@ -47,16 +48,19 @@ object Workflow {
 								stack.headOption.map(_.endState) == Some(entry.startState)
 							) {
 								stack.push(entry)
-							} else {
-								val newStack = Stack[LogEntry](entry)
-								sequences = sequences :+ newStack
+								pushed = true
 							}
+						}
+						if(!pushed) {
+							val newStack = Stack[LogEntry](entry)
+							sequences = sequences :+ newStack
 						}
 					case Backward => 
 						sequences.map { stack =>
 							stack.headOption.map { topEntry =>
-								if(topEntry.endState == entry.startState) {
+								if(topEntry.endState == entry.startState && !pushed) {
 									stack.push(entry)
+									pushed = true
 								}
 							}
 						}
