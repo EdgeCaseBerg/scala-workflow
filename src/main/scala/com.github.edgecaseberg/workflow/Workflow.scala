@@ -9,7 +9,7 @@ case object Backward extends Direction
 
 case class Action(from: State, to: State, flow: Direction, name: String)
 
-case class State(name: String, preRequisite: Option[State] = None)
+case class State(name: String)
 
 case class LogEntry(startState: State, endState: State, note: String, flowTaken: Direction, actionTaken: Action)
 

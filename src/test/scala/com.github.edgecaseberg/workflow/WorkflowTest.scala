@@ -6,10 +6,10 @@ import scala.collection.immutable.Set
 class WorkflowTest extends FlatSpec with Matchers {
 
 	object LoopWorkflow {
-		val startState = State("Start", None)
-		val s1 = State("S1", Some(startState))
-		val s2 = State("S2", Some(s1))
-		val s3 = State("S3", Some(s2))
+		val startState = State("Start")
+		val s1 = State("S1")
+		val s2 = State("S2")
+		val s3 = State("S3")
 
 		val startAction = Action(startState, s1, Forward, "a0")
 		val a1 = Action(s1, s2, Forward, "a1")
@@ -27,9 +27,9 @@ class WorkflowTest extends FlatSpec with Matchers {
 	}
 
 	object LinearWorkflow {
-		val startState = State("Start", None)
-		val s1 = State("S1", Some(startState))
-		val s2 = State("S2", Some(s1))
+		val startState = State("Start")
+		val s1 = State("S1")
+		val s2 = State("S2")
 
 		val startAction = Action(startState, s1, Forward, "a0")
 		val a1 = Action(s1, s2, Forward, "a1")
@@ -41,12 +41,12 @@ class WorkflowTest extends FlatSpec with Matchers {
 	}
 
 	object MultiEndStateLinearWorflow {
-		val startState = State("Start", None)
-		val s1 = State("S1", Some(startState))
-		val s2 = State("S2", Some(s1))
-		val s3 = State("S3", Some(s1))
-		val s4 = State("S4", Some(s2))
-		val s5 = State("S5", Some(s3))
+		val startState = State("Start")
+		val s1 = State("S1")
+		val s2 = State("S2")
+		val s3 = State("S3")
+		val s4 = State("S4")
+		val s5 = State("S5")
 
 		val startAction = Action(startState, s1, Forward, "a0")
 		val a1 = Action(s1, s2, Forward, "a1")
@@ -61,11 +61,11 @@ class WorkflowTest extends FlatSpec with Matchers {
 	}
 
 	object MultiEndLoopWorkflow {
-		val startState = State("Start", None)
-		val s1 = State("S1", Some(startState))
-		val s2 = State("S2", Some(s1))
-		val s3 = State("S3", Some(s2))
-		val s4 = State("S4", Some(s2))
+		val startState = State("Start")
+		val s1 = State("S1")
+		val s2 = State("S2")
+		val s3 = State("S3")
+		val s4 = State("S4")
 
 		val startAction = Action(startState, s1, Forward, "a0")
 		val a1 = Action(s1, s2, Forward, "a1")
