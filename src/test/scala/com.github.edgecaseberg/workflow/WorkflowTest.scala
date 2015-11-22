@@ -90,7 +90,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 		}
 	}
 
-	it should "resolve a simple one step transition" in {
+	"A call to determineCurrentState" should "resolve a simple one step transition" in {
 		val log = List(
 			LogEntry(LinearWorkflow.startState, LinearWorkflow.s1, "Null -> S1", Forward, LinearWorkflow.startAction)
 		)
@@ -151,6 +151,61 @@ class WorkflowTest extends FlatSpec with Matchers{
 		assertResult(Set(MultiEndLoopWorkflow.s3, MultiEndLoopWorkflow.s4)) {
 			Workflow.determineCurrentState(log, MultiEndLoopWorkflow.workflow)
 		}		
+	}
+
+	"The Workflow object" should "determine possible actions for a state" in {
+		assertResult(List(MultiEndLoopWorkflow.a2, MultiEndLoopWorkflow.a3)) {
+			MultiEndLoopWorkflow.workflow.possibleActionsForState(MultiEndLoopWorkflow.s2)
+		}
+		assertResult(List()) {
+			LinearWorkflow.workflow.possibleActionsForState(LinearWorkflow.s2)
+		}
+	}
+
+	it should "determine actions given a log of events" in {
+		val log = List(
+			LogEntry(MultiEndLoopWorkflow.startState, MultiEndLoopWorkflow.s1, "Null -> S1", Forward, MultiEndLoopWorkflow.startAction),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1)
+		)
+		assertResult(
+			Map(
+				MultiEndLoopWorkflow.s2 -> List(
+					MultiEndLoopWorkflow.a2, MultiEndLoopWorkflow.a3
+				)
+			)
+		) {
+			MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
+		}
+	}
+
+	it should "determine actions given a log of events with multi-end" in {
+		val log = List(
+			LogEntry(MultiEndLoopWorkflow.startState, MultiEndLoopWorkflow.s1, "Null -> S1", Forward, MultiEndLoopWorkflow.startAction),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.startState, MultiEndLoopWorkflow.s1, "Null -> S1", Forward, MultiEndLoopWorkflow.startAction),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2)
+		)
+		assertResult(
+			Map(
+				MultiEndLoopWorkflow.s2 -> List(
+					MultiEndLoopWorkflow.a2, MultiEndLoopWorkflow.a3
+				),
+				MultiEndLoopWorkflow.s1 -> List(
+					MultiEndLoopWorkflow.a1
+				)
+			)
+		) {
+			MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
+		}
 	}
 
 }
