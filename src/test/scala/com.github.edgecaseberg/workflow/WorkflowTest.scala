@@ -51,7 +51,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 			LogEntry(LinearWorkflow.startState, LinearWorkflow.s1, "Null -> S1", Forward, LinearWorkflow.startAction)
 		)
 		assertResult(LinearWorkflow.s1) {
-			Workflow.determineCurrentState(log, LinearWorkflow.workflow)
+			Workflow.determineCurrentState(log, LinearWorkflow.workflow).get
 		}
 	}
 
@@ -61,9 +61,9 @@ class WorkflowTest extends FlatSpec with Matchers{
 			LogEntry(LinearWorkflow.s1, LinearWorkflow.s2, "S1 -> S2", Forward, LinearWorkflow.a1)
 		)
 		assertResult(LinearWorkflow.s2) {
-			Workflow.determineCurrentState(log, LinearWorkflow.workflow)
+			Workflow.determineCurrentState(log, LinearWorkflow.workflow).get
 		}	
-	}
+	}		
 
 	it should "resolve a loop transition" in {
 		val log = List(
@@ -76,7 +76,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 			LogEntry(LoopWorkflow.s2, LoopWorkflow.s3, "S2 -> S3", Forward, LoopWorkflow.a3)
 		)
 		assertResult(LoopWorkflow.s3) {
-			Workflow.determineCurrentState(log, LoopWorkflow.workflow)
+			Workflow.determineCurrentState(log, LoopWorkflow.workflow).get
 		}		
 	}
 
