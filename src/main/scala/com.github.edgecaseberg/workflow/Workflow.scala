@@ -1,5 +1,8 @@
 package com.github.edgecaseberg.workflow
 
+import scala.collection.immutable.Set
+import scala.collection.mutable.Stack
+
 sealed trait Direction
 case object Forward extends Direction
 case object Backward extends Direction
@@ -16,8 +19,8 @@ object Workflow {
 	/** Determine the current state of a tracked object by it's Log and the workflow it adheres to
 	 *
 	 */
-	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Option[State] = {
-		val stack = new scala.collection.mutable.Stack[LogEntry]
+	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Set[State] = {
+		val stack = new Stack[LogEntry]
 		if (log.isEmpty) {
 			None
 		} else {
@@ -30,9 +33,9 @@ object Workflow {
 		}
 		println(stack)
 		if ( stack.isEmpty ) {
-			None
+			Set[State]()
 		} else {
-			Some(stack.pop().endState)
+			Set(stack.pop().endState)
 		}
 	}
 }

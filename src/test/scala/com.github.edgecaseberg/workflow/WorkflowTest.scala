@@ -1,6 +1,7 @@
 package com.github.edgecaseberg.workflow
 
 import org.scalatest._
+import scala.collection.immutable.Set
 
 class WorkflowTest extends FlatSpec with Matchers{
 
@@ -41,7 +42,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 
 	"A log" should "be considered a Start State if empty" in {
 		val result = Workflow.determineCurrentState(Nil, LoopWorkflow.workflow)
-		assertResult(None) {
+		assertResult(Set[State]()) {
 			result
 		}
 	}
@@ -50,8 +51,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 		val log = List(
 			LogEntry(LinearWorkflow.startState, LinearWorkflow.s1, "Null -> S1", Forward, LinearWorkflow.startAction)
 		)
-		assertResult(LinearWorkflow.s1) {
-			Workflow.determineCurrentState(log, LinearWorkflow.workflow).get
+		assertResult(Set(LinearWorkflow.s1)) {
+			Workflow.determineCurrentState(log, LinearWorkflow.workflow)
 		}
 	}
 
@@ -60,8 +61,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 			LogEntry(LinearWorkflow.startState, LinearWorkflow.s1, "Null -> S1", Forward, LinearWorkflow.startAction),
 			LogEntry(LinearWorkflow.s1, LinearWorkflow.s2, "S1 -> S2", Forward, LinearWorkflow.a1)
 		)
-		assertResult(LinearWorkflow.s2) {
-			Workflow.determineCurrentState(log, LinearWorkflow.workflow).get
+		assertResult(Set(LinearWorkflow.s2)) {
+			Workflow.determineCurrentState(log, LinearWorkflow.workflow)
 		}	
 	}		
 
@@ -75,8 +76,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 			LogEntry(LoopWorkflow.s1, LoopWorkflow.s2, "S1 -> S2", Forward, LoopWorkflow.a1),
 			LogEntry(LoopWorkflow.s2, LoopWorkflow.s3, "S2 -> S3", Forward, LoopWorkflow.a3)
 		)
-		assertResult(LoopWorkflow.s3) {
-			Workflow.determineCurrentState(log, LoopWorkflow.workflow).get
+		assertResult(Set(LoopWorkflow.s3)) {
+			Workflow.determineCurrentState(log, LoopWorkflow.workflow)
 		}		
 	}
 
