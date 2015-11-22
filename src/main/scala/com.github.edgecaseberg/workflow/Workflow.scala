@@ -15,10 +15,6 @@ case class Workflow(states: List[State], actions: List[Action])
 object Workflow {
 	/** Determine the current state of a tracked object by it's Log and the workflow it adheres to
 	 *
-	 * Algorithm: 
-	 *
-	 * ∅ + A = S 
-	 * S + A = S →
 	 */
 	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Option[State] = {
 		val stack = new scala.collection.mutable.Stack[LogEntry]
