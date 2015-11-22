@@ -32,7 +32,7 @@ object Workflow {
 	 *
 	 */
 
-	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Set[State] = {
+	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow): Set[State] = {
 		var sequences = List[Stack[LogEntry]](
 			Stack[LogEntry]()
 		)
@@ -42,23 +42,22 @@ object Workflow {
 			for (entry <- log) {
 				var pushed = false
 				entry.flowTaken match {
-					case Forward => 
+					case Forward =>
 						sequences.map { stack =>
-							if(stack.isEmpty || 
-								stack.headOption.map(_.endState) == Some(entry.startState)
-							) {
+							if (stack.isEmpty ||
+								stack.headOption.map(_.endState) == Some(entry.startState)) {
 								stack.push(entry)
 								pushed = true
 							}
 						}
-						if(!pushed) {
+						if (!pushed) {
 							val newStack = Stack[LogEntry](entry)
 							sequences = sequences :+ newStack
 						}
-					case Backward => 
+					case Backward =>
 						sequences.map { stack =>
 							stack.headOption.map { topEntry =>
-								if(topEntry.endState == entry.startState && !pushed) {
+								if (topEntry.endState == entry.startState && !pushed) {
 									stack.push(entry)
 									pushed = true
 								}
@@ -70,11 +69,11 @@ object Workflow {
 		sequences.map(_.headOption).filter(_.isDefined).map(_.get.endState).toSet
 	}
 
-	def possibleActionsForState(state: State, workflow: Workflow) : List[Action] = {
+	def possibleActionsForState(state: State, workflow: Workflow): List[Action] = {
 		workflow.actions.filter(_.from == state)
 	}
 
-	def possibleActionsForLog(log: Seq[LogEntry], workflow: Workflow) : Map[State, List[Action]] = {
-		determineCurrentState(log, workflow).map( state => state -> possibleActionsForState(state, workflow)).toMap
+	def possibleActionsForLog(log: Seq[LogEntry], workflow: Workflow): Map[State, List[Action]] = {
+		determineCurrentState(log, workflow).map(state => state -> possibleActionsForState(state, workflow)).toMap
 	}
 }

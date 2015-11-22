@@ -3,7 +3,7 @@ package com.github.edgecaseberg.workflow
 import org.scalatest._
 import scala.collection.immutable.Set
 
-class WorkflowTest extends FlatSpec with Matchers{
+class WorkflowTest extends FlatSpec with Matchers {
 
 	object LoopWorkflow {
 		val startState = State("Start", None)
@@ -22,7 +22,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 			),
 			actions = List(
 				startAction, a1, a2, a3
-			) 
+			)
 		)
 	}
 
@@ -79,7 +79,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 			),
 			actions = List(
 				startAction, a1, a2, a3, a4
-			) 
+			)
 		)
 	}
 
@@ -106,8 +106,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 		assertResult(Set(LinearWorkflow.s2)) {
 			Workflow.determineCurrentState(log, LinearWorkflow.workflow)
-		}	
-	}		
+		}
+	}
 
 	it should "resolve a loop transition" in {
 		val log = List(
@@ -121,7 +121,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 		assertResult(Set(LoopWorkflow.s3)) {
 			Workflow.determineCurrentState(log, LoopWorkflow.workflow)
-		}		
+		}
 	}
 
 	it should "resolve a multi-end state linear transition" in {
@@ -134,7 +134,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 		assertResult(Set(MultiEndStateLinearWorflow.s4, MultiEndStateLinearWorflow.s5)) {
 			Workflow.determineCurrentState(log, MultiEndStateLinearWorflow.workflow)
-		}	
+		}
 	}
 
 	it should "resolve a multi-end state looping transition" in {
@@ -150,7 +150,7 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 		assertResult(Set(MultiEndLoopWorkflow.s3, MultiEndLoopWorkflow.s4)) {
 			Workflow.determineCurrentState(log, MultiEndLoopWorkflow.workflow)
-		}		
+		}
 	}
 
 	"The Workflow object" should "determine possible actions for a state" in {
@@ -178,8 +178,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 				)
 			)
 		) {
-			MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
-		}
+				MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
+			}
 	}
 
 	it should "determine actions given a log of events with multi-end" in {
@@ -204,8 +204,8 @@ class WorkflowTest extends FlatSpec with Matchers{
 				)
 			)
 		) {
-			MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
-		}
+				MultiEndLoopWorkflow.workflow.possibleActionsForLog(log)
+			}
 	}
 
 }
