@@ -19,23 +19,38 @@ object Workflow {
 	/** Determine the current state of a tracked object by it's Log and the workflow it adheres to
 	 *
 	 */
+
 	def determineCurrentState(log: Seq[LogEntry], workflow: Workflow) : Set[State] = {
-		val stack = new Stack[LogEntry]
+		var sequences = List[Stack[LogEntry]](
+			Stack[LogEntry]()
+		)
 		if (log.isEmpty) {
 			Set[State]()
 		} else {
 			for (entry <- log) {
 				entry.flowTaken match {
-					case Forward => stack.push(entry)
-					case Backward => stack.pop(); stack.push(entry)
+					case Forward => 
+						sequences.map { stack =>
+							if(stack.isEmpty || 
+								stack.headOption.map(_.endState) == Some(entry.startState)
+							) {
+								stack.push(entry)
+							} else {
+								val newStack = Stack[LogEntry](entry)
+								sequences = sequences :+ newStack
+							}
+						}
+					case Backward => 
+						sequences.map { stack =>
+							stack.headOption.map { topEntry =>
+								if(topEntry.endState == entry.startState) {
+									stack.push(entry)
+								}
+							}
+						}
 				}
 			}
 		}
-		println(stack)
-		if ( stack.isEmpty ) {
-			Set[State]()
-		} else {
-			Set(stack.pop().endState)
-		}
+		sequences.map(_.headOption).filter(_.isDefined).map(_.get.endState).toSet
 	}
 }
