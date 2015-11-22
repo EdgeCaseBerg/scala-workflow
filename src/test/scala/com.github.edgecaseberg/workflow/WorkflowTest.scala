@@ -60,6 +60,29 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 	}
 
+	object MultiEndLoopWorkflow {
+		val startState = State("Start", None)
+		val s1 = State("S1", Some(startState))
+		val s2 = State("S2", Some(s1))
+		val s3 = State("S3", Some(s2))
+		val s4 = State("S4", Some(s2))
+
+		val startAction = Action(startState, s1, Forward, "a0")
+		val a1 = Action(s1, s2, Forward, "a1")
+		val a2 = Action(s2, s1, Backward, "a2")
+		val a3 = Action(s2, s3, Forward, "a3")
+		val a4 = Action(s3, s4, Forward, "a4")
+
+		val workflow = Workflow(
+			states = List(
+				startState, s1, s2, s3, s4
+			),
+			actions = List(
+				startAction, a1, a2, a3, a4
+			) 
+		)
+	}
+
 	"A log" should "be considered a Start State if empty" in {
 		val result = Workflow.determineCurrentState(Nil, LoopWorkflow.workflow)
 		assertResult(Set[State]()) {
@@ -112,6 +135,22 @@ class WorkflowTest extends FlatSpec with Matchers{
 		assertResult(Set(MultiEndStateLinearWorflow.s4, MultiEndStateLinearWorflow.s5)) {
 			Workflow.determineCurrentState(log, MultiEndStateLinearWorflow.workflow)
 		}	
+	}
+
+	it should "resolve a multi-end state looping transition" in {
+		val log = List(
+			LogEntry(MultiEndLoopWorkflow.startState, MultiEndLoopWorkflow.s1, "Null -> S1", Forward, MultiEndLoopWorkflow.startAction),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s1, "S2 -> S1", Backward, MultiEndLoopWorkflow.a2),
+			LogEntry(MultiEndLoopWorkflow.s1, MultiEndLoopWorkflow.s2, "S1 -> S2", Forward, MultiEndLoopWorkflow.a1),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s3, "S2 -> S3", Forward, MultiEndLoopWorkflow.a3),
+			LogEntry(MultiEndLoopWorkflow.s2, MultiEndLoopWorkflow.s4, "S2 -> S4", Forward, MultiEndLoopWorkflow.a4)
+		)
+		assertResult(Set(MultiEndLoopWorkflow.s3, MultiEndLoopWorkflow.s4)) {
+			Workflow.determineCurrentState(log, MultiEndLoopWorkflow.workflow)
+		}		
 	}
 
 }
