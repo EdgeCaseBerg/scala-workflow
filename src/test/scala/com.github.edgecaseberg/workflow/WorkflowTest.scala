@@ -40,6 +40,26 @@ class WorkflowTest extends FlatSpec with Matchers{
 		)
 	}
 
+	object MultiEndStateLinearWorflow {
+		val startState = State("Start", None)
+		val s1 = State("S1", Some(startState))
+		val s2 = State("S2", Some(s1))
+		val s3 = State("S3", Some(s1))
+		val s4 = State("S4", Some(s2))
+		val s5 = State("S5", Some(s3))
+
+		val startAction = Action(startState, s1, Forward, "a0")
+		val a1 = Action(s1, s2, Forward, "a1")
+		val a2 = Action(s2, s4, Forward, "a2")
+		val a3 = Action(s1, s3, Forward, "a3")
+		val a4 = Action(s3, s5, Forward, "a4")
+
+		val workflow = Workflow(
+			states = List(startState, s1, s2, s3, s4, s5),
+			actions = List(startAction, a1, a2, a3, a4)
+		)
+	}
+
 	"A log" should "be considered a Start State if empty" in {
 		val result = Workflow.determineCurrentState(Nil, LoopWorkflow.workflow)
 		assertResult(Set[State]()) {
@@ -79,6 +99,19 @@ class WorkflowTest extends FlatSpec with Matchers{
 		assertResult(Set(LoopWorkflow.s3)) {
 			Workflow.determineCurrentState(log, LoopWorkflow.workflow)
 		}		
+	}
+
+	it should "resolve a multi-end state linear transition" in {
+		val log = List(
+			LogEntry(MultiEndStateLinearWorflow.startState, MultiEndStateLinearWorflow.s1, "∅ → S1", Forward, MultiEndStateLinearWorflow.startAction),
+			LogEntry(MultiEndStateLinearWorflow.s1, MultiEndStateLinearWorflow.s2, "S1 → S2", Forward, MultiEndStateLinearWorflow.a1),
+			LogEntry(MultiEndStateLinearWorflow.s1, MultiEndStateLinearWorflow.s3, "S1 → S3", Forward, MultiEndStateLinearWorflow.a3),
+			LogEntry(MultiEndStateLinearWorflow.s2, MultiEndStateLinearWorflow.s4, "S2 → S4", Forward, MultiEndStateLinearWorflow.a2),
+			LogEntry(MultiEndStateLinearWorflow.s3, MultiEndStateLinearWorflow.s5, "S3 → S5", Forward, MultiEndStateLinearWorflow.a4)
+		)
+		assertResult(Set(MultiEndStateLinearWorflow.s4, MultiEndStateLinearWorflow.s5)) {
+			Workflow.determineCurrentState(log, MultiEndStateLinearWorflow.workflow)
+		}	
 	}
 
 }
